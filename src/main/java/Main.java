@@ -1,5 +1,7 @@
-import entity.Student;
 import jakarta.persistence.*;
+import entity.*;
+import java.sql.Date;
+import java.time.LocalDateTime;
 
 public class Main {
     public static void main(String[] args)
@@ -10,11 +12,12 @@ public class Main {
 
         try{
             transaction.begin();
-            Student student = new Student();
-            student.setId("014000415");
-            student.setName("Noah Reef");
-            student.setCourse("OOAD");
-            entityManager.merge(student);
+            Item item = new Item("2451LS", "Harry Potter", "Wizards", "Hogwarts", 12.50);
+            entityManager.merge(item);
+            Date date = new Date(2001,6,19);
+            Book harry = new Book(new String[]{"J.K. Rowling"}, 13, "HP Publishing", date);
+            harry.setItemByItemCode(item);
+            entityManager.merge(harry);
             transaction.commit();
         }finally {
             if(transaction.isActive()){

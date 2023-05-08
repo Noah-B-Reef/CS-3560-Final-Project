@@ -2,12 +2,12 @@ package entity;
 
 import jakarta.persistence.*;
 
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "student", schema = "public", catalog = "library_db")
 public class Student {
-    
+
     @Id
     @Column(name = "id")
     private String id;
@@ -17,6 +17,15 @@ public class Student {
     @Basic
     @Column(name = "course")
     private String course;
+
+    public Student(String id, String name, String course)
+    {
+        this.id = id;
+        this.name = name;
+        this.course = course;
+    }
+
+    public Student(){}
 
     public String getId() {
         return id;
@@ -46,12 +55,13 @@ public class Student {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Student that = (Student) o;
-        return Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(course, that.course);
+        Student student = (Student) o;
+        return Objects.equals(id, student.id) && Objects.equals(name, student.name) && Objects.equals(course, student.course);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, course);
     }
+
 }
