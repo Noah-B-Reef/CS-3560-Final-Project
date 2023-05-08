@@ -6,6 +6,8 @@
     <persistence-unit name="default">
 
         <class>entity.Student</class>
+        <class>entity.Loan</class>
+
         <properties>
             <property name="toplink.jdbc.url" value="jdbc:postgresql://localhost:5432/library_db"/>
             <property name="toplink.jdbc.driver" value="org.postgresql.Driver"/>
