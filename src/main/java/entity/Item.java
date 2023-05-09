@@ -18,6 +18,7 @@ public class Item {
     @Basic
     @Column(name = "description")
     private String description;
+    // Status: True if checkout-able False if currently checked out
     @Basic
     @Column(name = "status")
     private boolean status;
