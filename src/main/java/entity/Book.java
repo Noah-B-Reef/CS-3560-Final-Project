@@ -3,15 +3,16 @@ package entity;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
 @Table(name="book")
 public class Book {
 
-    @Basic
-    @Column(name = "authors")
-    private Object authors;
+
+    @Column(name = "authors", columnDefinition = "text[]")
+    private String authors;
     @Basic
     @Column(name = "pages")
     private Integer pages;
@@ -23,10 +24,10 @@ public class Book {
     private Date publicationDate;
     @Id
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_code", referencedColumnName = "code ", nullable = false)
+    @JoinColumn(name = "item_code", referencedColumnName = "code", nullable = false)
     private Item itemByItemCode;
 
-    public Book(String[] authors, Integer pages, String publisher, Date publicationDate)
+    public Book(String authors, Integer pages, String publisher, Date publicationDate)
     {
         this.authors = authors;
         this.pages = pages;
@@ -47,7 +48,7 @@ public class Book {
         return authors;
     }
 
-    public void setAuthors(Object authors) {
+    public void setAuthors(String authors) {
         this.authors = authors;
     }
 

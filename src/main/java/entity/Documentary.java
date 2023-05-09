@@ -21,7 +21,7 @@ public class Documentary {
     @Column(name = "release_date")
     private Date releaseDate;
     @OneToOne
-    @JoinColumn(name = "item_code", referencedColumnName = "code ", nullable = false)
+    @JoinColumn(name = "item_code", referencedColumnName = "code", nullable = false)
     private Item itemByItemCode;
 
     public Documentary(String director, Integer length, Date releaseDate)

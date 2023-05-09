@@ -22,7 +22,7 @@ public class Loan {
     @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false)
     private Student studentByStudentId;
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "item_code", referencedColumnName = "code ")
+    @JoinColumn(name = "item_code", referencedColumnName = "code")
     private Item itemByItemCode;
 
     public Loan(Date date, Date dueDate)

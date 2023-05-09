@@ -10,7 +10,7 @@ import java.util.Objects;
 public class Item {
 
     @Id
-    @Column(name = "code ")
+    @Column(name = "code")
     private String code;
     @Basic
     @Column(name = "title")

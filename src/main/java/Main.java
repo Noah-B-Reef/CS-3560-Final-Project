@@ -12,12 +12,14 @@ public class Main {
 
         try{
             transaction.begin();
+
             Item item = new Item("2451LS", "Harry Potter", "Wizards", "Hogwarts", 12.50);
-            entityManager.merge(item);
-            Date date = new Date(2001,6,19);
-            Book harry = new Book(new String[]{"J.K. Rowling"}, 13, "HP Publishing", date);
+
+            Date date = Date.valueOf("2001-06-19");
+            String authors = "J.K. Rowling";
+            Book harry = new Book(authors, 13, "HP Publishing", date);
             harry.setItemByItemCode(item);
-            entityManager.merge(harry);
+            entityManager.persist(harry);
             transaction.commit();
         }finally {
             if(transaction.isActive()){
