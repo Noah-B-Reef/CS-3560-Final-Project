@@ -2,8 +2,11 @@ package entity;
 
 import jakarta.persistence.*;
 
+import javax.swing.plaf.synth.SynthMenuBarUI;
 import java.sql.Date;
+import java.sql.Time;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Entity
 public class Loan {
@@ -29,6 +32,11 @@ public class Loan {
     {
         this.date = date;
         this.dueDate = dueDate;
+    }
+
+    public Loan()
+    {
+        this.date = new Date(System.currentTimeMillis());
     }
     public int getNumber() {
         return number;
@@ -93,4 +101,16 @@ public class Loan {
     public void setItemByItemCode(Item itemByItemCode) {
         this.itemByItemCode = itemByItemCode;
     }
+
+    public double computeFine()
+    {
+        return Math.pow(itemByItemCode.getDailyPrice() * .10, (System.currentTimeMillis() - dueDate.getTime())/ TimeUnit.DAYS.toMillis(1));
+    }
+
+    public double computeFine(Date date)
+    {
+        double price = itemByItemCode.getDailyPrice();
+        return Math.pow((price * .10), (date.getTime() - dueDate.getTime())/ TimeUnit.DAYS.toMillis(1)) - price;
+    }
+
 }
