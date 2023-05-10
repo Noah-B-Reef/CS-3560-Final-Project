@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import javax.swing.plaf.synth.SynthMenuBarUI;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -110,7 +112,33 @@ public class Loan {
     public double computeFine(Date date)
     {
         double price = itemByItemCode.getDailyPrice();
-        return Math.pow((price * .10), (date.getTime() - dueDate.getTime())/ TimeUnit.DAYS.toMillis(1)) - price;
+        return Math.pow((price * .10), (date.getTime() - dueDate.getTime())/ TimeUnit.DAYS.toMillis(1));
+    }
+
+    public List reciept()
+    {
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        List<Object> result = new ArrayList<Object>();
+        result.add(this.getNumber());
+        result.add(this.getDate());
+        result.add(this.getDueDate());
+        result.add(this.studentByStudentId.getId());
+        result.add(this.studentByStudentId.getName());
+        result.add(this.itemByItemCode.getTitle());
+        result.add(this.itemByItemCode.getDailyPrice());
+        try{
+            Book book = entityManager.getReference(Book.class,this.itemByItemCode.getCode());
+            result.add(book.getAuthors());
+            result.add(book.getPublisher());
+
+        }catch(Exception e){
+            Documentary doc = entityManager.getReference(Documentary.class, this.itemByItemCode.getCode());
+            result.add(doc.getDirector());
+        }
+       return result;
     }
 
 }

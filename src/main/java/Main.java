@@ -2,6 +2,8 @@ import jakarta.persistence.*;
 import entity.*;
 import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -46,10 +48,13 @@ public class Main {
              */
 
             Loan loan = entityManager.getReference(Loan.class,1);
+            List result = loan.reciept();
+            System.out.print(Arrays.toString(result.toArray()));
+            /*
             Date date = Date.valueOf("2030-06-19");
             System.out.println(date.getTime());
             System.out.println("Your fine is: " + loan.computeFine(date));
-
+             */
 
         }finally {
             if(transaction.isActive()){
