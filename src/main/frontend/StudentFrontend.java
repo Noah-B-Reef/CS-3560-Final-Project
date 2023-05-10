@@ -1,17 +1,27 @@
 package src.main.frontend;
 import javax.swing.*; // Needed for Swing classes
 import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.hibernate.Session;
+import src.main.jdbc.ConnectionFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 import entity.Student;
 import jakarta.persistence.*;
+//import org.postgresql.core.ConnectionFactory;
 
-public class StudentFrontend extends JFrame implements ActionListener{
+public class StudentFrontend extends JFrame {
     JFrame frame = new JFrame("StudentFrontend");
     EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
     EntityManager entityManager = entityManagerFactory.createEntityManager();
     EntityTransaction transaction = entityManager.getTransaction();
 
-    private JPanel nameAndButtons;
+    public JPanel nameAndButtons;
     private JTextField Name;
     private JPanel buttonBar;
     private JButton add;
@@ -19,62 +29,130 @@ public class StudentFrontend extends JFrame implements ActionListener{
     private JButton delete;
     private JButton update;
     private JTextField course;
-    private JLabel nameLabel;
     private JLabel Course;
     private JPanel coursePanel;
+    private JTextField id;
+    private JLabel idLabel;
+    private JLabel student_name;
+    private JButton backButton;
+
 
     public StudentFrontend(){
 
-//        buttonBar.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                super.mouseClicked(e);
-//            }
-
-//        Name.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String name = Name.getText();
-//                JOptionPane.showMessageDialog(null, "Your name is " + name);
-//            }
-//
-//        });
-//
-//        course.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String course = Course.getText();
-//                JOptionPane.showMessageDialog(null, "Course " + course);
-//            }
-//        });
+        frame.setSize(500,500);
+        add.addActionListener(new ButtonsAndTextField());
+        update.addActionListener(new ButtonsAndTextField());
+        delete.addActionListener(new ButtonsAndTextField());
+        search.addActionListener(new ButtonsAndTextField());
+        backButton.addActionListener(new ButtonsAndTextField());
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        String name = Name.getText();
-        String course = Course.getText();
 
-        if (e.getSource() == add){
-            transaction.begin();
-            Student student = new Student("011111111", name, course);
-        }
-        else if (e.getSource() == update){
+    private class ButtonsAndTextField implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String name = Name.getText();
+            String courseVal = course.getText();
+            String broncoID = id.getText();
+            Student studentInp = new Student(broncoID, name, courseVal);
 
-        }
-        else if (e.getSource() == search){
+            if (e.getSource() == add) {
 
-        }
-        else if (e.getSource() == delete){
+                transaction.begin();
 
+                entityManager.persist(studentInp);
+                transaction.commit();
+
+
+                JOptionPane.showMessageDialog(null, "Your name is: " + name +
+                        "\nAnd your course entered is: " + courseVal + "\nBronco ID: " + broncoID);
+
+            } else if (e.getSource() == update) {
+                try {
+                    //making a connection to the db and seeing if a row is returned that has the values we want
+                    Connection connection = ConnectionFactory.getConnection();
+                    System.out.println("Updating student " +studentInp.getName());
+                    PreparedStatement stmt = connection.prepareStatement("UPDATE public.student " +
+                            "SET id=?, name=?, course=? WHERE id = ?");
+                    //since we have 4 parameters in this SQL statement, we need to pass each in one-by-one
+                    stmt.setString(1, broncoID);
+                    stmt.setString(2,name);
+                    stmt.setString(3,courseVal);
+                    stmt.setString(4,broncoID);
+
+                    stmt.executeUpdate();
+                    //autocommit is ON, so we don't need to use connection.commit();
+                    System.out.println("Successfully updated student");
+
+
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            } else if (e.getSource() == search) {
+                try {
+                    //making a connection to the db and seeing if a row is returned that has the values we want
+                    Connection connection = ConnectionFactory.getConnection();
+                    System.out.println("Searching for " +studentInp.getName());
+                    //deleting student based on whether or not id matches input
+                    PreparedStatement stmt = connection.prepareStatement("SELECT id, name, course\n" +
+                            "\tFROM public.student WHERE id =?");
+//                    stmt.setInt(1, Integer.parseInt(broncoID));
+                    stmt.setString(1, broncoID);
+//                    stmt.setString(2, name);
+//                    stmt.setString(3, courseVal);
+                    stmt.executeUpdate();
+                    //autocommit is ON, so we don't need to use connection.commit();
+                    System.out.println("Found " + name + " within db!");
+
+
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            } else if (e.getSource() == delete) {
+                try {
+                    //making a connection to the db and seeing if a row is returned that has the values we want
+                    Connection connection = ConnectionFactory.getConnection();
+                    System.out.println("Deleting Student " +studentInp.getName());
+                    //deleting student based on whether or not id matches input
+                    PreparedStatement stmt = connection.prepareStatement("DELETE FROM public.student\n" +
+                            "\tWHERE id= ?");
+//                    stmt.setInt(1, Integer.parseInt(broncoID));
+                    stmt.setString(1, broncoID);
+
+                    stmt.executeUpdate();
+                    //autocommit is ON, so we don't need to use connection.commit();
+                    System.out.println("Successfully deleted student");
+
+
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            } else if (e.getSource() == backButton) {
+                WelcomeWindow welcomeInstance = new WelcomeWindow();
+                welcomeInstance.frame.setContentPane(new WelcomeWindow().revenuePanel);
+
+                welcomeInstance.frame.pack();
+                welcomeInstance.frame.setVisible(true);
+
+            }
         }
     }
-
     public static void main(String[] args) {
         JFrame frame = new JFrame("StudentFrontend");
         frame.setContentPane(new StudentFrontend().nameAndButtons);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+
 
     }
 
