@@ -1,4 +1,4 @@
 package src.main.frontend;
 
-public class Items {
+public class RevenueWindow {
 }

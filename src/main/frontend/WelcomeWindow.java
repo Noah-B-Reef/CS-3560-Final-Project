@@ -53,17 +53,19 @@ public class WelcomeWindow extends JFrame
                 studentWindow.frame.setVisible(true);
 
             }
-            if(e.getSource() == loansButton){
-            /*
-            make loansWindow visible
-             */
+            else if(e.getSource() == loansButton){
+                LoanWindow loanInstance = new LoanWindow();
+                loanInstance.frame.setContentPane(new LoanWindow().fullPanel);
+                loanInstance.frame.pack();
+                loanInstance.frame.setVisible(true);
             }
-            if(e.getSource() == itemsButton){
-                /*
-                make items window visible
-             */
-
-            }if(e.getSource() == generateRevenueReportButton){
+            else if(e.getSource() == itemsButton){
+                ItemsFrontend itemInstance = new ItemsFrontend();
+                itemInstance.setContentPane(itemInstance.topLevelPanel);
+                itemInstance.pack();
+                itemInstance.setVisible(true);
+            }
+            else if(e.getSource() == generateRevenueReportButton){
                 /*
                 make revenue window visible
                  */

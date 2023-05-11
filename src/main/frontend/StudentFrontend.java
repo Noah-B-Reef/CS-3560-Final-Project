@@ -48,6 +48,7 @@ public class StudentFrontend extends JFrame {
     }
 
 
+
     private class ButtonsAndTextField implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -64,7 +65,7 @@ public class StudentFrontend extends JFrame {
                 transaction.commit();
 
 
-                JOptionPane.showMessageDialog(null, "Your name is: " + name +
+                JOptionPane.showMessageDialog(null, "Name entered: " + name +
                         "\nAnd your course entered is: " + courseVal + "\nBronco ID: " + broncoID);
 
             } else if (e.getSource() == update) {
@@ -96,16 +97,27 @@ public class StudentFrontend extends JFrame {
                     //making a connection to the db and seeing if a row is returned that has the values we want
                     Connection connection = ConnectionFactory.getConnection();
                     System.out.println("Searching for " +studentInp.getName());
-                    //deleting student based on whether or not id matches input
+                    //searching for student based off of their ID value
                     PreparedStatement stmt = connection.prepareStatement("SELECT id, name, course\n" +
                             "\tFROM public.student WHERE id =?");
-//                    stmt.setInt(1, Integer.parseInt(broncoID));
+
                     stmt.setString(1, broncoID);
-//                    stmt.setString(2, name);
-//                    stmt.setString(3, courseVal);
-                    stmt.executeUpdate();
+
+                    ResultSet rs = stmt.executeQuery();
                     //autocommit is ON, so we don't need to use connection.commit();
-                    System.out.println("Found " + name + " within db!");
+                    while(rs.next()) {
+                        if (broncoID.equals(rs.getString("id"))) {
+                            JOptionPane.showMessageDialog(null, "Found " + rs.getString("name") + " within db!");
+                            System.out.println("Found " + rs.getString("name") + " within db!" + "\nSetting values to ones found in db");
+                            //Name, course, id, use setText for each of these textfields
+                            Name.setText(rs.getString("name"));
+                            course.setText(rs.getString("course"));
+                            id.setText(rs.getString("id"));
+
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Failed to find student with ID:" + broncoID + " within db!");
+                        }
+                    }
 
 
                 } catch (ClassNotFoundException ex) {
@@ -138,10 +150,11 @@ public class StudentFrontend extends JFrame {
 
             } else if (e.getSource() == backButton) {
                 WelcomeWindow welcomeInstance = new WelcomeWindow();
-                welcomeInstance.frame.setContentPane(new WelcomeWindow().revenuePanel);
+                welcomeInstance.frame.setContentPane(welcomeInstance.revenuePanel);
 
                 welcomeInstance.frame.pack();
                 welcomeInstance.frame.setVisible(true);
+
 
             }
         }
