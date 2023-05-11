@@ -17,6 +17,7 @@ import jakarta.persistence.*;
 
 public class StudentFrontend extends JFrame {
     JFrame frame = new JFrame("StudentFrontend");
+
     EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
     EntityManager entityManager = entityManagerFactory.createEntityManager();
     EntityTransaction transaction = entityManager.getTransaction();
@@ -39,7 +40,7 @@ public class StudentFrontend extends JFrame {
 
     public StudentFrontend(){
 
-        frame.setSize(500,500);
+        setSize(600,500);
         add.addActionListener(new ButtonsAndTextField());
         update.addActionListener(new ButtonsAndTextField());
         delete.addActionListener(new ButtonsAndTextField());
@@ -151,7 +152,7 @@ public class StudentFrontend extends JFrame {
             } else if (e.getSource() == backButton) {
                 WelcomeWindow welcomeInstance = new WelcomeWindow();
                 welcomeInstance.frame.setContentPane(welcomeInstance.revenuePanel);
-
+                welcomeInstance.frame.setLocationRelativeTo(null);
                 welcomeInstance.frame.pack();
                 welcomeInstance.frame.setVisible(true);
 
@@ -163,6 +164,7 @@ public class StudentFrontend extends JFrame {
         JFrame frame = new JFrame("StudentFrontend");
         frame.setContentPane(new StudentFrontend().nameAndButtons);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
 

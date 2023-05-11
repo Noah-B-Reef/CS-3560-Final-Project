@@ -1,5 +1,7 @@
 package src.main.frontend;
 
+import entity.Loan;
+
 import javax.swing.*; // Needed for Swing classes
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -49,6 +51,7 @@ public class WelcomeWindow extends JFrame
                 //create a new StudentFrontend object and set its components to visible
                 StudentFrontend studentWindow = new StudentFrontend();
                 studentWindow.frame.setContentPane(new StudentFrontend().nameAndButtons);
+                studentWindow.frame.setLocationRelativeTo(null);
                 studentWindow.frame.pack();
                 studentWindow.frame.setVisible(true);
 
@@ -56,19 +59,21 @@ public class WelcomeWindow extends JFrame
             else if(e.getSource() == loansButton){
                 LoanWindow loanInstance = new LoanWindow();
                 loanInstance.frame.setContentPane(new LoanWindow().fullPanel);
+                loanInstance.frame.setLocationRelativeTo(null);
                 loanInstance.frame.pack();
                 loanInstance.frame.setVisible(true);
             }
             else if(e.getSource() == itemsButton){
                 ItemsFrontend itemInstance = new ItemsFrontend();
                 itemInstance.setContentPane(itemInstance.topLevelPanel);
+                itemInstance.frame.setLocationRelativeTo(null);
                 itemInstance.pack();
                 itemInstance.setVisible(true);
             }
             else if(e.getSource() == generateRevenueReportButton){
-                /*
-                make revenue window visible
-                 */
+                Loan loanValue = new Loan();
+
+                JOptionPane.showMessageDialog(null, "Revenue is: $1000000" );
             }
 
 
@@ -91,6 +96,7 @@ public class WelcomeWindow extends JFrame
         frame.setSize(500,500);
         frame.setContentPane(new WelcomeWindow().revenuePanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
     }

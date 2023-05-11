@@ -100,6 +100,11 @@ public class LoanWindow {
             //constructor for entity in Loan class is empty
             //Loan loanInstance = new Loan(number, origination_date, due_date, bronco_id, itemCodeVal);
             if (e.getSource() == addButton) {
+                ReceiptWindow receiptWindowInstance = new ReceiptWindow();
+                receiptWindowInstance.frame.setContentPane(receiptWindowInstance.containerPanel);
+                receiptWindowInstance.frame.setLocationRelativeTo(null);
+                receiptWindowInstance.frame.pack();
+                receiptWindowInstance.frame.setVisible(true);
                 try {
                     //making a connection to the db and seeing if a row is returned that has the values we want
                     Connection connection = ConnectionFactory.getConnection();
@@ -119,6 +124,7 @@ public class LoanWindow {
                 }
                 JOptionPane.showMessageDialog(null, "Loan number: " + number + "\nDate: " +
                         "\n");
+
             }
             if (e.getSource() == updateButton) {
                   try{
@@ -210,12 +216,13 @@ public class LoanWindow {
 //	            WHERE <condition>;
             }
             if (e.getSource() == viewCurrentLoansButton) {
-
+                JOptionPane.showMessageDialog(null,"This feature is not available at the moment. Please try again later." + JOptionPane.ERROR_MESSAGE);
             }
             if (e.getSource() == backButton) {
                 WelcomeWindow welcomeInstance = new WelcomeWindow();
                 welcomeInstance.frame.setContentPane(welcomeInstance.revenuePanel);
 //                welcomeInstance.frame.setDefaultCloseOperation(welcomeInstance.frame.EXIT_ON_CLOSE);
+                welcomeInstance.frame.setLocationRelativeTo(null);
                 welcomeInstance.frame.pack();
                 welcomeInstance.frame.setVisible(true);
             }
@@ -225,7 +232,7 @@ public class LoanWindow {
         JFrame frame = new JFrame("LoanWindow");
         frame.setContentPane(new LoanWindow().fullPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
     }
