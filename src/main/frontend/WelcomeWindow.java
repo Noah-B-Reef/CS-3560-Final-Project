@@ -1,6 +1,7 @@
 package src.main.frontend;
 
 import javax.swing.*; // Needed for Swing classes
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,6 +29,12 @@ public class WelcomeWindow extends JFrame
     {
 
         StudentFrontendButton.addActionListener(new WelcomeButtons());
+        StudentFrontendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            Frame[] to_die  = WelcomeWindow.getFrames();
+            to_die[0].dispose(); }
+        });
         loansButton.addActionListener(new WelcomeButtons());
         itemsButton.addActionListener(new WelcomeButtons());
         generateRevenueReportButton.addActionListener(new WelcomeButtons());
