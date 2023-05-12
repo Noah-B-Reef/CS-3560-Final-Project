@@ -132,6 +132,7 @@ public class StudentFrontend extends JFrame {
                     //making a connection to the db and seeing if a row is returned that has the values we want
                     Connection connection = ConnectionFactory.getConnection();
                     System.out.println("Deleting Student " +studentInp.getName());
+//                    SessionFactory factory = new Configuration().configure("persistence.xml").addAnnotatedClass(Student.class).buildSessionFactory();
                     //deleting student based on whether or not id matches input
                     PreparedStatement stmt = connection.prepareStatement("DELETE FROM public.student\n" +
                             "\tWHERE id= ?");

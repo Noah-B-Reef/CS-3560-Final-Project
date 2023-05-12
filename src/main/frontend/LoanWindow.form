@@ -33,7 +33,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value="00/00/0000"/>
+              <text value="0000-00-00"/>
             </properties>
           </component>
           <component id="34891" class="javax.swing.JTextField" binding="dueDate">
@@ -43,7 +43,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value="00/00/0000"/>
+              <text value="0000-00-00"/>
             </properties>
           </component>
           <vspacer id="615b9">
@@ -162,6 +162,7 @@
             </constraints>
             <properties>
               <text value="Search"/>
+              <toolTipText value="Search using Number and Student ID"/>
             </properties>
           </component>
         </children>
