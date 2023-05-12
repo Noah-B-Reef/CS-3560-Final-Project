@@ -9,9 +9,11 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import org.postgresql.util.PSQLException;
 import src.main.jdbc.ConnectionFactory;
 
 public class LoanWindow {
@@ -80,17 +82,22 @@ public class LoanWindow {
             String itemCodeVal = itemCode.getText();
 
             //parsing string->java.util.Date->java.sql.Date
+//            DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//            java.sql.Date dateValue = (java.sql.Date) simpleDateFormat.parse("");
             java.util.Date java_due_date;
+            java.sql.Date due_date;
             try {
-                java_due_date = new SimpleDateFormat("dd/MM/yyyy").parse(dueDate.getText());
-                java.sql.Date due_date = new java.sql.Date(java_due_date.getTime());
+                java_due_date = new SimpleDateFormat("yyyy-MM-dd").parse(dueDate.getText());
+                due_date = new java.sql.Date(java_due_date.getTime());
             } catch (ParseException ex) {
                 throw new RuntimeException(ex);
             }
-            java.util.Date java_origination_date;
+            //declaring before initializing values in try catch so scope is wider
+            java.sql.Date java_origination_date;
+            java.util.Date java_util_origination_date;
             try {
-                java_origination_date = new SimpleDateFormat("dd/MM/yyyy").parse(originationDate.getText());
-                java.sql.Date origination_date = new java.sql.Date(java_due_date.getTime());
+                java_util_origination_date = new SimpleDateFormat("yyyy-dd-MM").parse(originationDate.getText());
+                java_origination_date = new java.sql.Date(java_util_origination_date.getTime());
 
             } catch (ParseException ex) {
                 throw new RuntimeException(ex);
@@ -112,15 +119,17 @@ public class LoanWindow {
                             "(\"number\", due_date, bronco_id, item_code, date)" +
                             "\nVALUES (?, ?, ?, ?, ?)");
                     stmt.setInt(1, number);
-                    stmt.setString(2,"02/01/2023");
+                    stmt.setDate(2, due_date);
                     stmt.setString(3, bronco_id);
                     stmt.setString(4,itemCodeVal);
-                    stmt.setString(5,"01/01/2023");
+                    stmt.setDate(5,java_origination_date);
                     stmt.executeUpdate();
                 } catch (ClassNotFoundException e2) {
                     throw new RuntimeException(e2);
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                } catch (SQLException e3) {
+                    JOptionPane.showMessageDialog(null,e3);
+                    throw new RuntimeException(e3);
+
                 }
                 JOptionPane.showMessageDialog(null, "Loan number: " + number + "\nDate: " +
                         "\n");
@@ -131,13 +140,14 @@ public class LoanWindow {
                       Connection connection = ConnectionFactory.getConnection();
                       PreparedStatement stmt = connection.prepareStatement("UPDATE public.\"Loan\"\n" +
                                         "SET \"number\"=?, due_date=?, bronco_id=?, item_code=?, date=?\n" +
-                                        "WHERE id =?");
+                                        "WHERE number =?");
 
                       stmt.setInt(1, number);
-                      stmt.setString(2,originationDate.getText());
+                      stmt.setDate(2,due_date);
                       stmt.setString(3, bronco_id);
                       stmt.setString(4,itemCodeVal);
-                      stmt.setString(5,dueDate.getText());
+                      stmt.setDate(5,java_origination_date);
+                      stmt.setInt(6, number);
                       stmt.executeUpdate();
                       JOptionPane.showMessageDialog(null, "Successfully updated values for Loans table");
                   } catch(ClassNotFoundException ex0){
@@ -155,19 +165,21 @@ public class LoanWindow {
                 try {
                     //making a connection to the db and seeing if a row is returned that has the values we want
                     Connection connection = ConnectionFactory.getConnection();
-                    String optionPaneID = JOptionPane.showInputDialog("Enter ID to search for: ");
-                    System.out.println("Searching for " +optionPaneID);
+                    
+
+                    System.out.println("Searching for student id #" +bronco_id + " with loan#" + number);
                     //searching for student based off of their ID value
                     PreparedStatement stmt = connection.prepareStatement("SELECT *\n" +
-                            "\tFROM public.\"Loan\" WHERE id =?");
+                            "\tFROM public.\"Loan\" WHERE bronco_id =? AND number =?");
 
-                    stmt.setString(1, optionPaneID);
+                    stmt.setString(1, bronco_id);
+                    stmt.setInt(2,number);
 
                     ResultSet rs = stmt.executeQuery();
                     //autocommit is ON, so we don't need to use connection.commit();
                     while(rs.next()) {
-                        if (optionPaneID.equals(rs.getString("bronco_id"))) {
-                            JOptionPane.showMessageDialog(null, "Found " + rs.getString("bronco_id") + " within db!"+ "\nSetting values to ones found in db");
+                        if (bronco_id.equals(rs.getString("bronco_id")) && number == (rs.getInt("number"))) {
+                            JOptionPane.showMessageDialog(null, "Found Bronco ID: " + rs.getString("bronco_id") + "with loan #" + rs.getInt("number") +" within db!"+ "\nSetting values to ones found in db");
                             System.out.println("Found " + rs.getString("bronco_id") + " within db!" );
                             //Name, course, id, use setText for each of these textfields
                             studentIDs.setText(rs.getString("bronco_id"));
@@ -176,7 +188,7 @@ public class LoanWindow {
                             dueDate.setText(rs.getString("due_date"));
 
                         } else {
-                            JOptionPane.showMessageDialog(null, "Failed to find student with ID:" + optionPaneID + " within db!");
+                            JOptionPane.showMessageDialog(null, "Failed to find loan with bronco ID:" + bronco_id + "and loan#" + number + " within db!\nPlease check to see if your ");
                         }
                     }
 
@@ -198,9 +210,10 @@ public class LoanWindow {
                     System.out.println("Deleting Student");
                     //deleting student based on whether or not id matches input
                     PreparedStatement stmt = connection.prepareStatement("DELETE FROM public.\"Loan\"\n" +
-                            "\tWHERE bronco_id= ?");
+                            "\tWHERE bronco_id= ? AND number=?");
 //                    stmt.setInt(1, Integer.parseInt(broncoID));
                     stmt.setString(1, bronco_id);
+                    stmt.setInt(2,number);
 
                     stmt.executeUpdate();
                     //autocommit is ON, so we don't need to use connection.commit();
