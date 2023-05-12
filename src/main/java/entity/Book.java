@@ -11,8 +11,6 @@ import java.util.Objects;
 public class Book {
 
 
-    @Column(name = "authors", columnDefinition = "text[]")
-    private String authors;
     @Basic
     @Column(name = "pages")
     private Integer pages;
@@ -26,16 +24,22 @@ public class Book {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "item_code", referencedColumnName = "code", nullable = false)
     private Item itemByItemCode;
-
-    public Book(String authors, Integer pages, String publisher, Date publicationDate)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "item_code")
+    private String itemCode;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "authors", referencedColumnName = "name")
+    private Author authorByAuthors;
+    public Book(Integer pages, String publisher, Date publicationDate)
     {
-        this.authors = authors;
         this.pages = pages;
         this.publisher = publisher;
         this.publicationDate = publicationDate;
     }
 
     public Book(){}
+
     public String getItemCode() {
         return itemByItemCode.getCode();
     }
@@ -44,13 +48,6 @@ public class Book {
         this.itemByItemCode.setCode(itemCode);
     }
 
-    public Object getAuthors() {
-        return authors;
-    }
-
-    public void setAuthors(String authors) {
-        this.authors = authors;
-    }
 
     public Integer getPages() {
         return pages;
@@ -81,10 +78,8 @@ public class Book {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return Objects.equals(itemByItemCode, book.itemByItemCode) && Objects.equals(authors, book.authors) && Objects.equals(pages, book.pages) && Objects.equals(publisher, book.publisher) && Objects.equals(publicationDate, book.publicationDate);
+        return Objects.equals(itemByItemCode, book.itemByItemCode)  && Objects.equals(pages, book.pages) && Objects.equals(publisher, book.publisher) && Objects.equals(publicationDate, book.publicationDate);
     }
-
-
 
     public Item getItemByItemCode() {
         return itemByItemCode;
@@ -92,5 +87,18 @@ public class Book {
 
     public void setItemByItemCode(Item itemByItemCode) {
         this.itemByItemCode = itemByItemCode;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(itemCode, pages, publisher, publicationDate);
+    }
+
+    public Author getAuthorByAuthors() {
+        return authorByAuthors;
+    }
+
+    public void setAuthorByAuthors(Author authorByAuthors) {
+        this.authorByAuthors = authorByAuthors;
     }
 }
