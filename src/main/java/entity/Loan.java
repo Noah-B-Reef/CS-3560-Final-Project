@@ -36,10 +36,20 @@ public class Loan {
         this.dueDate = dueDate;
     }
 
+
     public Loan()
     {
         this.date = new Date(System.currentTimeMillis());
     }
+
+//    public Loan(int number, Date date, Date dueDate, Student studentByStudentId, Item item_code) {
+//        this.number = number;
+//        this.date = date;
+//        this.dueDate = dueDate;
+//        this.studentByStudentId = (String) studentByStudentId;
+//        this.item_code = itemCodeVal;
+//    }
+
     public int getNumber() {
         return number;
     }
