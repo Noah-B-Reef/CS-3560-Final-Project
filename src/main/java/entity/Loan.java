@@ -141,12 +141,12 @@ public class Loan {
         result.add(this.itemByItemCode.getDailyPrice());
         try{
             Book book = entityManager.getReference(Book.class,this.itemByItemCode.getCode());
-            result.add(book.getAuthors());
+            result.add(book.getAuthorByAuthors().getName());
             result.add(book.getPublisher());
 
         }catch(Exception e){
             Documentary doc = entityManager.getReference(Documentary.class, this.itemByItemCode.getCode());
-            result.add(doc.getDirector());
+            result.add(doc.getDirectorByDirector().getName());
         }
        return result;
     }
