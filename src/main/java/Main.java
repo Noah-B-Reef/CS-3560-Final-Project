@@ -27,12 +27,12 @@ public class Main {
              */
 
             // Example Adding a Student to Table
-            /*
+
             transaction.begin();
-            Student student = new Student("0221432", "Jon Doe", "Comp Sci");
+            Student student = new Student("022", "Jon Doe", "Comp Sci");
             entityManager.persist(student);
             transaction.commit();
-            */
+
 
             // Example Adding a Loan
             /*
@@ -46,7 +46,7 @@ public class Main {
             entityManager.persist(loan);
             transaction.commit();
              */
-
+            /*
             Loan loan = entityManager.getReference(Loan.class,1);
             List result = loan.reciept();
             System.out.print(Arrays.toString(result.toArray()));

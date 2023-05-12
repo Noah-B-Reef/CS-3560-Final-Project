@@ -24,10 +24,7 @@ public class Book {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "item_code", referencedColumnName = "code", nullable = false)
     private Item itemByItemCode;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "item_code")
-    private String itemCode;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "authors", referencedColumnName = "name")
     private Author authorByAuthors;
@@ -91,7 +88,7 @@ public class Book {
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemCode, pages, publisher, publicationDate);
+        return Objects.hash(this.itemByItemCode.getCode(), pages, publisher, publicationDate);
     }
 
     public Author getAuthorByAuthors() {
