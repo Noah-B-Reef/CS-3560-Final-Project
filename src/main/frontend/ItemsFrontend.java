@@ -27,6 +27,7 @@ public class ItemsFrontend extends JFrame{
     private JTextField location;
     public JPanel topLevelPanel;
     private JTextField dailyPrice;
+    private JTextField txtTitle;
 
 
     public ItemsFrontend(){
@@ -72,9 +73,10 @@ public class ItemsFrontend extends JFrame{
         @Override
         public void actionPerformed(ActionEvent e) {
             String code = itemType.getText();
-            String title = (String) nameOfItem.getSelectedItem();
+            String title = txtTitle.getText();
             String descriptionText = description.getText() ;
             String locationVal = location.getText();
+            // Redundant check, already set to true by default
             boolean checkedOutVal = (boolean)status.getSelectedItem();
             double daily_price = Double.parseDouble(dailyPrice.getText());
             Item itemInp = new Item(code, title, descriptionText, locationVal, daily_price);
@@ -95,6 +97,7 @@ public class ItemsFrontend extends JFrame{
 //
 //                stmt.executeUpdate();
                 transaction.begin();
+                itemInp.setStatus((boolean) status.getSelectedItem());
                 entityManager.persist(itemInp);
                 transaction.commit();
 

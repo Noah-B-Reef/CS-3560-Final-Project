@@ -105,6 +105,12 @@ public class Item {
     }
 
     @Override
+    public String toString()
+    {
+        return this.getTitle();
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(code, title, description, status, location);
     }
