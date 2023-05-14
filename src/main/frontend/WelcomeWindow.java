@@ -1,7 +1,5 @@
 package src.main.frontend;
-
 import entity.Loan;
-
 import javax.swing.*; // Needed for Swing classes
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -19,7 +17,7 @@ public class WelcomeWindow extends JFrame
     private JButton generateRevenueReportButton;
     public JPanel revenuePanel;
     private JPanel choicesPanel;
-    private JButton StudentFrontendButton;
+    private JButton PeopleOpsButton;
     private JButton loansButton;
     private JButton itemsButton;
 
@@ -30,8 +28,8 @@ public class WelcomeWindow extends JFrame
     public WelcomeWindow()
     {
 
-        StudentFrontendButton.addActionListener(new WelcomeButtons());
-        StudentFrontendButton.addActionListener(new ActionListener() {
+        PeopleOpsButton.addActionListener(new WelcomeButtons());
+        PeopleOpsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             Frame[] to_die  = WelcomeWindow.getFrames();
@@ -45,16 +43,8 @@ public class WelcomeWindow extends JFrame
     private class WelcomeButtons implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            if(e.getSource() == StudentFrontendButton){
-
-                //create a new StudentFrontend object and set its components to visible
-                StudentFrontend studentWindow = new StudentFrontend();
-                studentWindow.frame.setContentPane(new StudentFrontend().nameAndButtons);
-                studentWindow.frame.setLocationRelativeTo(null);
-                studentWindow.frame.pack();
-                studentWindow.frame.setVisible(true);
-
+            if(e.getSource() == PeopleOpsButton){
+                PeopleOpsWindow peopleOpsWindow = new PeopleOpsWindow();
             }
             else if(e.getSource() == loansButton){
                 LoanWindow loanInstance = new LoanWindow();
@@ -75,15 +65,7 @@ public class WelcomeWindow extends JFrame
 
                 JOptionPane.showMessageDialog(null, "Revenue is: $1000000" );
             }
-
-
-
-
         }
-
-
-
-
     }
 
     /**
