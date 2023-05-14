@@ -16,20 +16,20 @@
         <properties>
             <property name="toplink.jdbc.url" value="jdbc:postgresql://localhost:5432/postgres"/>
             <property name="toplink.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="toplink.jdbc.user" value="nreef"/>
-            <property name="toplink.jdbc.password" value="1234"/>
+            <property name="toplink.jdbc.user" value="postgres"/>
+            <property name="toplink.jdbc.password" value="123"/>
             <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/library_db"/>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
-            <property name="hibernate.connection.username" value="nreef"/>
-            <property name="hibernate.connection.password" value="1234"/>
+            <property name="hibernate.connection.username" value="postgres"/>
+            <property name="hibernate.connection.password" value="123"/>
             <property name="openjpa.ConnectionURL" value="jdbc:postgresql://localhost:5432/library_db"/>
             <property name="openjpa.ConnectionDriverName" value="org.postgresql.Driver"/>
-            <property name="openjpa.ConnectionUserName" value="nreef"/>
-            <property name="openjpa.ConnectionPassword" value="1234"/>
+            <property name="openjpa.ConnectionUserName" value="postgres"/>
+            <property name="openjpa.ConnectionPassword" value="123"/>
             <property name="eclipselink.jdbc.url" value="jdbc:postgresql://localhost:5432/library_db"/>
             <property name="eclipselink.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="eclipselink.jdbc.user" value="nreef"/>
-            <property name="eclipselink.jdbc.password" value="1234"/>
+            <property name="eclipselink.jdbc.user" value="postgres"/>
+            <property name="eclipselink.jdbc.password" value="123"/>
         </properties>
     </persistence-unit>
 </persistence>

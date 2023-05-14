@@ -10,7 +10,7 @@ public class ConnectionFactory {
     //change USER and PWD values to your respective usernames and passwords
     private static final String USER = "postgres";
 
-    private static final String PWD = "1234b";
+    private static final String PWD = "123";
 
     public static Connection getConnection() throws ClassNotFoundException, SQLException {
 
