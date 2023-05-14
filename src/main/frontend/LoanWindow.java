@@ -1,19 +1,26 @@
 package src.main.frontend;
-
+import entity.*;
+import entity.Book;
+import entity.Documentary;
+import entity.Student;
+import jakarta.persistence.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
+import jakarta.persistence.criteria.Root;
 
+import javax.print.Doc;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
-import org.postgresql.util.PSQLException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import src.main.jdbc.ConnectionFactory;
 
 public class LoanWindow {
@@ -34,12 +41,56 @@ public class LoanWindow {
     private JButton viewCurrentLoansButton;
     private JPanel buttonPanel;
     public JPanel fullPanel;
-    private JTextField itemCode;
+
     private JTextField studentIDs;
     private JLabel Student;
+    private JRadioButton bookRadioButton;
+    private JRadioButton documentaryRadioButton;
+    private JComboBox itemCombo;
+    private JComboBox studentCombo;
 
 
     public LoanWindow(){
+
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        // Add Customers to Combobox
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Student> cr = cb.createQuery(Student.class);
+        Root<Student> root = cr.from(Student.class);
+        cr.select(root);
+        TypedQuery<Student> query = entityManager.createQuery(cr);
+        List<Student> students = query.getResultList();
+
+        // removes all items currently in comboBox
+        studentCombo.removeAllItems();
+
+        for (int i = 0; i < students.toArray().length; i++)
+        {
+            studentCombo.addItem(students.get(i).getId());
+        }
+
+
+        CriteriaQuery<Book> cr2 = cb.createQuery(Book.class);
+        Root<Book> root2 = cr2.from(Book.class);
+        cr2.select(root2);
+        TypedQuery<Book> query2 = entityManager.createQuery(cr2);
+        List<Book> books = query2.getResultList();
+
+        // Add Customers to Combobox
+        CriteriaBuilder cb3 = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Documentary> cr3 = cb3.createQuery(Documentary.class);
+        Root<Documentary> root3 = cr3.from(Documentary.class);
+        cr3.select(root3);
+        TypedQuery<Documentary> query3 = entityManager.createQuery(cr3);
+        List<Documentary> docs = query3.getResultList();
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(bookRadioButton);
+        group.add(documentaryRadioButton);
+
         addButton.addActionListener(new LoanWindowButtons());
         updateButton.addActionListener(new LoanWindowButtons());
         searchButton.addActionListener(new LoanWindowButtons());
@@ -48,6 +99,43 @@ public class LoanWindow {
         backButton.addActionListener(new LoanWindowButtons());
 
 //        FillStudentIDs();
+        bookRadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+                EntityManager entityManager = entityManagerFactory.createEntityManager();
+                EntityTransaction transaction = entityManager.getTransaction();
+
+
+
+                // removes all items currently in comboBox
+                itemCombo.removeAllItems();
+
+                for (int i = 0; i < books.toArray().length; i++)
+                {
+                    itemCombo.addItem(books.get(i).getItemByItemCode());
+                }
+
+
+            }
+        });
+        documentaryRadioButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+                EntityManager entityManager = entityManagerFactory.createEntityManager();
+                EntityTransaction transaction = entityManager.getTransaction();
+
+
+                // removes all items currently in comboBox
+                itemCombo.removeAllItems();
+
+                for (int i = 0; i < docs.toArray().length; i++)
+                {
+                    itemCombo.addItem(docs.get(i).getItemByItemCode());
+                }
+            }
+        });
     }
 
 //    public void FillStudentIDs(){
@@ -69,6 +157,7 @@ public class LoanWindow {
 //    }
 
     private class LoanWindowButtons implements ActionListener{
+
         @Override
         public void actionPerformed(ActionEvent e) {
 //            try {
@@ -78,8 +167,9 @@ public class LoanWindow {
 //
 //            }
             int number = Integer.parseInt(loanNumber.getText());
-            String bronco_id = studentIDs.getText();
-            String itemCodeVal = itemCode.getText();
+            String bronco_id = studentCombo.getSelectedItem().toString();
+
+            String itemCodeVal = ((Item) itemCombo.getSelectedItem()).getCode();
 
             //parsing string->java.util.Date->java.sql.Date
 //            DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -115,8 +205,8 @@ public class LoanWindow {
                 try {
                     //making a connection to the db and seeing if a row is returned that has the values we want
                     Connection connection = ConnectionFactory.getConnection();
-                    PreparedStatement stmt = connection.prepareStatement("INSERT INTO public.\"Loan\"" +
-                            "(\"number\", due_date, bronco_id, item_code, date)" +
+                    PreparedStatement stmt = connection.prepareStatement("INSERT INTO public.\"loan\"" +
+                            "(\"number\", due_date, student_id, item_code, date)" +
                             "\nVALUES (?, ?, ?, ?, ?)");
                     stmt.setInt(1, number);
                     stmt.setDate(2, due_date);
@@ -183,7 +273,7 @@ public class LoanWindow {
                             System.out.println("Found " + rs.getString("bronco_id") + " within db!" );
                             //Name, course, id, use setText for each of these textfields
                             studentIDs.setText(rs.getString("bronco_id"));
-                            itemCode.setText(rs.getString("item_code"));
+                            //itemCode.setText(rs.getString("item_code"));
                             originationDate.setText(rs.getString("date"));
                             dueDate.setText(rs.getString("due_date"));
 

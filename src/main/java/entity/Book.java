@@ -91,6 +91,7 @@ public class Book {
         return Objects.hash(this.itemByItemCode.getCode(), pages, publisher, publicationDate);
     }
 
+
     public Author getAuthorByAuthors() {
         return authorByAuthors;
     }
