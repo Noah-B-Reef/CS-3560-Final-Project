@@ -21,7 +21,7 @@ public class Documentary {
     @OneToOne
     @JoinColumn(name = "item_code", referencedColumnName = "code", nullable = false)
     private Item itemByItemCode;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "director", referencedColumnName = "name")
     private Director directorByDirector;
 
@@ -63,6 +63,25 @@ public class Documentary {
         if (o == null || getClass() != o.getClass()) return false;
         Documentary that = (Documentary) o;
         return Objects.equals(itemCode, that.itemCode)  && Objects.equals(length, that.length) && Objects.equals(releaseDate, that.releaseDate);
+    }
+
+    public void deleteDocumentary()
+    {
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        this.setDirectorByDirector(null);
+
+        transaction.begin();
+        entityManager.remove(this);
+        transaction.commit();
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.getItemByItemCode().toString();
     }
 
     @Override

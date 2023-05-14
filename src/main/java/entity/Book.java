@@ -1,13 +1,15 @@
 package entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
-@Table(name="book")
+@Table(name="book", schema = "public")
 public class Book {
 
 
@@ -25,7 +27,7 @@ public class Book {
     @JoinColumn(name = "item_code", referencedColumnName = "code", nullable = false)
     private Item itemByItemCode;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade=CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "authors", referencedColumnName = "name")
     private Author authorByAuthors;
     public Book(Integer pages, String publisher, Date publicationDate)
@@ -78,6 +80,12 @@ public class Book {
         return Objects.equals(itemByItemCode, book.itemByItemCode)  && Objects.equals(pages, book.pages) && Objects.equals(publisher, book.publisher) && Objects.equals(publicationDate, book.publicationDate);
     }
 
+    @Override
+    public String toString()
+    {
+        return this.getItemByItemCode().toString();
+    }
+
     public Item getItemByItemCode() {
         return itemByItemCode;
     }
@@ -98,5 +106,20 @@ public class Book {
 
     public void setAuthorByAuthors(Author authorByAuthors) {
         this.authorByAuthors = authorByAuthors;
+    }
+
+    public void deleteBook()
+    {
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        this.setAuthorByAuthors(null);
+
+        transaction.begin();
+        entityManager.remove(this);
+        transaction.commit();
+
+        System.out.println("Successfully Deleted!");
     }
 }

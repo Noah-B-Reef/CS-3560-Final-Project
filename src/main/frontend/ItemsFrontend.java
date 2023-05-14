@@ -1,12 +1,20 @@
 package src.main.frontend;
+import entity.*;
+import entity.Book;
+import entity.Documentary;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import org.hibernate.HibernateError;
+import org.hibernate.dialect.PostgreSQLDialect;
 import src.main.jdbc.ConnectionFactory;
 import jakarta.persistence.*;
 import javax.swing.*; // Needed for Swing classes
 import java.awt.event.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import entity.Item;
 
 public class ItemsFrontend extends JFrame{
@@ -28,10 +36,64 @@ public class ItemsFrontend extends JFrame{
     public JPanel topLevelPanel;
     private JTextField dailyPrice;
     private JTextField txtTitle;
+    private JTabbedPane tabbedPane1;
+    private JPanel Book;
+    private JRadioButton bookRadioButton;
+    private JRadioButton documentaryRadioButton;
+    private JComboBox authorCombo;
+    private JTextField txtPages;
+    private JTextField txtPublisher;
+    private JTextField txtDate;
+    private JComboBox directorCombo;
+    private JTextField txtLength;
+    private JTextField txtRelease;
+    private JLabel Director;
+    private JTextPane textPane1;
 
 
     public ItemsFrontend(){
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction transaction = entityManager.getTransaction();
 
+        // Add Books to Combobox
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Author> cr2 = cb.createQuery(Author.class);
+        Root<Author> root2 = cr2.from(Author.class);
+        cr2.select(root2);
+        TypedQuery<Author> query2 = entityManager.createQuery(cr2);
+        List<Author> authors = query2.getResultList();
+
+        // removes all items currently in comboBox
+        authorCombo.removeAllItems();
+
+        for (int i = 0; i < authors.toArray().length; i++)
+        {
+            authorCombo.addItem(authors.get(i).getName());
+        }
+
+        status.addItem(true);
+        status.addItem(false);
+
+        // Add Documentaries to Combobox
+        CriteriaBuilder cb3 = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Director> cr3 = cb3.createQuery(Director.class);
+        Root<Director> root3 = cr3.from(Director.class);
+        cr3.select(root3);
+        TypedQuery<Director> query3 = entityManager.createQuery(cr3);
+        List<Director> direcs = query3.getResultList();
+
+        // removes all items currently in comboBox
+        directorCombo.removeAllItems();
+
+        for (int i = 0; i < direcs.toArray().length; i++)
+        {
+            directorCombo.addItem(direcs.get(i).getName());
+        }
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(bookRadioButton);
+        group.add(documentaryRadioButton);
 
 
         addButton.addActionListener(new ItemsListener());
@@ -41,7 +103,7 @@ public class ItemsFrontend extends JFrame{
         deleteButton.addActionListener(new ItemsListener());
 
 
-        ShowItemValues();
+        //ShowItemValues();
     }
 
 
@@ -70,8 +132,32 @@ public class ItemsFrontend extends JFrame{
     }
 
     private class ItemsListener implements ActionListener{
+
+
         @Override
         public void actionPerformed(ActionEvent e) {
+            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+            EntityTransaction transaction = entityManager.getTransaction();
+
+            // Add Books to Combobox
+            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+            CriteriaQuery<Author> cr2 = cb.createQuery(Author.class);
+            Root<Author> root2 = cr2.from(Author.class);
+            cr2.select(root2);
+            TypedQuery<Author> query2 = entityManager.createQuery(cr2);
+            List<Author> authors = query2.getResultList();
+
+            // Add Documentaries to Combobox
+            CriteriaBuilder cb3 = entityManager.getCriteriaBuilder();
+            CriteriaQuery<Director> cr3 = cb3.createQuery(Director.class);
+            Root<Director> root3 = cr3.from(Director.class);
+            cr3.select(root3);
+            TypedQuery<Director> query3 = entityManager.createQuery(cr3);
+            List<Director> direcs = query3.getResultList();
+
+
+        if(e.getSource() ==addButton) {
             String code = itemType.getText();
             String title = txtTitle.getText();
             String descriptionText = description.getText() ;
@@ -80,8 +166,6 @@ public class ItemsFrontend extends JFrame{
             boolean checkedOutVal = (boolean)status.getSelectedItem();
             double daily_price = Double.parseDouble(dailyPrice.getText());
             Item itemInp = new Item(code, title, descriptionText, locationVal, daily_price);
-
-        if(e.getSource() ==addButton) {
             try {
 //                Connection connection = ConnectionFactory.getConnection();
 //
@@ -96,10 +180,37 @@ public class ItemsFrontend extends JFrame{
 //                stmt.setString(4,broncoID);
 //
 //                stmt.executeUpdate();
+
+
+
                 transaction.begin();
                 itemInp.setStatus((boolean) status.getSelectedItem());
                 entityManager.persist(itemInp);
                 transaction.commit();
+                if (bookRadioButton.isSelected())
+                {
+                    Book book = new Book();
+                    book.setItemByItemCode(itemInp);
+                    book.setAuthorByAuthors(authors.get(authorCombo.getSelectedIndex()));
+                    book.setPages(Integer.parseInt(txtPages.getText()));
+                    book.setPublisher(txtPublisher.getText());
+                    book.setPublicationDate(Date.valueOf(txtDate.getText()));
+                    transaction.begin();
+                    entityManager.persist(book);
+                    transaction.commit();
+                }
+                else
+                {
+                    Documentary doc = new Documentary();
+                    doc.setItemByItemCode(itemInp);
+                    doc.setDirectorByDirector(direcs.get(directorCombo.getSelectedIndex()));
+                    doc.setLength(Integer.parseInt(txtLength.getText()));
+                    doc.setReleaseDate(Date.valueOf(txtDate.getText()));
+                    transaction.begin();
+                    entityManager.persist(doc);
+                    transaction.commit();
+                }
+
 
 
                 JOptionPane.showMessageDialog(null, "Item code entered: " + code +
@@ -110,6 +221,14 @@ public class ItemsFrontend extends JFrame{
                 throw new RuntimeException(ex);
             }
         }else if (e.getSource() == updateButton) {
+                String code = itemType.getText();
+                String title = txtTitle.getText();
+                String descriptionText = description.getText() ;
+                String locationVal = location.getText();
+                // Redundant check, already set to true by default
+                boolean checkedOutVal = (boolean)status.getSelectedItem();
+                double daily_price = Double.parseDouble(dailyPrice.getText());
+                Item itemInp = new Item(code, title, descriptionText, locationVal, daily_price);
                 try {
                     //making a connection to the db and seeing if a row is returned that has the values we want
                     Connection connection = ConnectionFactory.getConnection();
@@ -138,6 +257,95 @@ public class ItemsFrontend extends JFrame{
 
             } else if (e.getSource() == searchButton) {
                 try {
+                    // Add Customers to Combobox
+                    CriteriaQuery<Book> cr = cb.createQuery(Book.class);
+                    Root<Book> root = cr.from(Book.class);
+                    cr.select(root);
+                    TypedQuery<Book> query = entityManager.createQuery(cr);
+                    List<Book> books = query.getResultList();
+                    List<Object> titles = new ArrayList<Object>();
+
+                    for (int i = 0; i < books.toArray().length; i++)
+                    {
+                        titles.add(books.get(i).toString());
+                    }
+                    CriteriaQuery<Documentary> cr1 = cb.createQuery(Documentary.class);
+                    Root<Documentary> root1 = cr1.from(Documentary.class);
+                    cr1.select(root1);
+                    TypedQuery<Documentary> query1 = entityManager.createQuery(cr1);
+                    List<Documentary> docs = query1.getResultList();
+                    List<Object> docTitles = new ArrayList<Object>();
+                    for (int i = 0; i < docs.toArray().length; i++)
+                    {
+                        docTitles.add(docs.get(i).toString());
+                    }
+
+                    Object[] options = {"Book",
+                            "Documentary"};
+                    int n = JOptionPane.showOptionDialog(frame,
+                            "Select Item Type",
+                            "Type Selection",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,     //do not use a custom Icon
+                            options,  //the titles of buttons
+                            options[0]); //default button title
+
+                    if (n == 0)
+                    {
+
+                        String selection = (String)JOptionPane.showInputDialog(
+                                frame,
+                                "Select Book",
+                                "Customized Dialog",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                titles.toArray(),
+                                "ham");
+                        int index = titles.indexOf(selection);
+
+                        Book book = books.get(index);
+                        itemType.setText(book.getItemByItemCode().getCode());
+                        txtTitle.setText(book.getItemByItemCode().getTitle());
+                        status.setSelectedItem(book.getItemByItemCode().isStatus());
+                        description.setText(book.getItemByItemCode().getDescription());
+                        location.setText(book.getItemByItemCode().getLocation());
+                        dailyPrice.setText(String.valueOf(book.getItemByItemCode().getDailyPrice()));
+                        authorCombo.setSelectedItem(book.getAuthorByAuthors());
+                        txtPages.setText(String.valueOf(book.getPages()));
+                        txtPublisher.setText(book.getPublisher());
+                        txtDate.setText(book.getPublicationDate().toString());
+                        bookRadioButton.setSelected(true);
+                    }
+                    else
+                    {
+                        String selection = (String)JOptionPane.showInputDialog(
+                                frame,
+                                "Select Documentary",
+                                "Customized Dialog",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                docTitles.toArray(),
+                                "ham");
+
+                        int index = docTitles.indexOf(selection);
+                        Documentary doc = docs.get(index);
+                        itemType.setText(doc.getItemCode());
+                        txtTitle.setText(doc.getItemByItemCode().getTitle());
+                        status.setSelectedItem(doc.getItemByItemCode().isStatus());
+                        description.setText(doc.getItemByItemCode().getDescription());
+                        location.setText(doc.getItemByItemCode().getLocation());
+                        dailyPrice.setText(String.valueOf(doc.getItemByItemCode().getDailyPrice()));
+                        directorCombo.setSelectedItem(doc.getDirectorByDirector());
+                        txtLength.setText(String.valueOf(doc.getLength()));
+                        txtRelease.setText(doc.getReleaseDate().toString());
+                        documentaryRadioButton.setSelected(true);
+                    }
+
+
+
+
+                    /*
                     //making a connection to the db and seeing if a row is returned that has the values we want
                     Connection connection = ConnectionFactory.getConnection();
                     System.out.println("Searching for item with code: " +itemInp.getCode());
@@ -173,33 +381,35 @@ public class ItemsFrontend extends JFrame{
 //                    public JPanel topLevelPanel;
 //                    private JTextField dailyPrice;
 
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                     */
+                }  catch (Exception err) {
+                    JOptionPane.showMessageDialog(frame, "Entry not in database!");
                 }
 
             } else if (e.getSource() == deleteButton) {
-                try {
-                    //making a connection to the db and seeing if a row is returned that has the values we want
-                    Connection connection = ConnectionFactory.getConnection();
-                    System.out.println("Deleting item " + code);
-                    //deleting student based on whether or not id matches input
-                    PreparedStatement stmt = connection.prepareStatement("DELETE FROM public.item\n" +
-                            "\tWHERE code= ?");
-//                    stmt.setInt(1, Integer.parseInt(broncoID));
-                    stmt.setString(1, code);
+                try{
+                    String item_code = itemType.getText();
+                    if (bookRadioButton.isSelected())
+                    {
+                        Book book = entityManager.getReference(Book.class, item_code);
+                        transaction.begin();
+                        entityManager.remove(book);
+                        entityManager.remove(book.getItemByItemCode());
+                        transaction.commit();
+                    }
 
-                    stmt.executeUpdate();
-                    //autocommit is ON, so we don't need to use connection.commit();
-                    System.out.println("Successfully deleted student");
+                    else
+                    {
+                        Documentary doc = entityManager.getReference(Documentary.class, item_code);
+                        transaction.begin();
+                        entityManager.remove(doc);
+                        entityManager.remove(doc.getItemByItemCode());
+                        transaction.commit();
+                    }
 
-
-                } catch (ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
+                    }catch (HibernateError err) {
+                       JOptionPane.showMessageDialog(frame, "Unable to delete entry!");
+                     }
 
             }
         else if (e.getSource() == backButton){
